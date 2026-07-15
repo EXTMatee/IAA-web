@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAA • International Affairs Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Kormányzati/Rendvédelmi színek: Sötétkék és Arany */
+            --bg-dark: #020617;
+            --bg-card: #0f172a;
+            --accent-main: #1d4ed8; /* Királykék */
+            --accent-gold: #fbbf24; /* Hivatalos arany */
+            --text-light: #f8fafc;
+            --text-gray: #94a3b8;
+            --transition: cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
+        body { background-color: var(--bg-dark); color: var(--text-light); font-family: 'Montserrat', sans-serif; overflow-x: hidden; scroll-behavior: smooth; background-image: radial-gradient(circle at 50% 0%, rgba(29, 78, 216, 0.05) 0%, transparent 50%); }
+        
+        .bg-glow { position: absolute; top: -20%; left: -10%; width: 800px; height: 800px; background: radial-gradient(circle, rgba(29, 78, 216, 0.08) 0%, rgba(0,0,0,0) 60%); z-index: -1; pointer-events: none; filter: blur(50px); animation: pulseGlow 8s infinite alternate; }
+        @keyframes pulseGlow { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-main); border-radius: 4px; }
+        
+        .custom-cursor-dot { width: 6px; height: 6px; background-color: var(--accent-main); position: fixed; pointer-events: none; z-index: 10000; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--accent-main); }
+        .custom-cursor-outline { width: 45px; height: 45px; border: 1px solid rgba(251, 191, 36, 0.5); position: fixed; pointer-events: none; z-index: 9999; border-radius: 50%; transform: translate(-50%, -50%); transition: transform 0.15s ease-out, border-color 0.3s; }
+
+        nav { position: fixed; top: 0; width: 100%; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(2, 6, 23, 0.9); border-bottom: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(15px); }
+        .logo { display: flex; align-items: center; gap: 15px; font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        .logo img { height: 40px; width: auto; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3)); }
+        .logo span { color: var(--accent-main); }
+        
+        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+        .nav-links a { color: var(--text-gray); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: var(--transition); position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--accent-gold); transition: var(--transition); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; }
+        
+        .btn-tgf { background: linear-gradient(135deg, var(--accent-main) 0%, #1e3a8a 100%); color: #fff !important; padding: 10px 24px; border-radius: 4px; border: 1px solid rgba(100,150,255,0.2); box-shadow: 0 5px 20px rgba(29, 78, 216, 0.3); font-weight: 700; }
+        .btn-tgf::after { display: none; }
+        .btn-tgf:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(29, 78, 216, 0.5); }
+
+        .view-section { display: none; min-height: 100vh; padding: 140px 5% 80px 5%; max-width: 1400px; margin: 0 auto; animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .view-section.active-view { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .title-large { font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; line-height: 1.1; letter-spacing: 1px; color: #fff; }
+        .title-large span { color: var(--accent-main); text-shadow: 0 0 20px rgba(29, 78, 216, 0.5); }
+        .subtitle { color: var(--accent-gold); font-size: 1.2rem; font-weight: 500; margin-bottom: 40px; letter-spacing: 3px; text-transform: uppercase; }
+
+        .story-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; margin-bottom: 60px; }
+        .story-content { background: rgba(15, 23, 42, 0.6); padding: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-left: 4px solid var(--accent-main); }
+        .story-text p { margin-bottom: 20px; line-height: 1.8; color: var(--text-gray); text-align: justify; font-size: 1.05rem; }
+        .story-text p:first-of-type { color: #fff; font-weight: 600; font-size: 1.15rem; }
+        
+        .faction-image-container { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .faction-image-container img { max-width: 80%; height: auto; display: block; filter: drop-shadow(0 0 30px rgba(29, 78, 216, 0.4)); animation: floatImg 6s ease-in-out infinite; }
+        @keyframes floatImg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* Kettős doboz az elvárásoknak és kínálatnak */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+        .info-box { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+        .info-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .box-req::before { background: var(--accent-main); }
+        .box-offer::before { background: var(--accent-gold); }
+        .info-box h3 { font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .info-box ul { list-style: none; }
+        .info-box ul li { margin-bottom: 12px; color: var(--text-gray); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+        .info-box ul li::before { content: '✓'; color: var(--accent-main); font-weight: bold; }
+        .box-offer ul li::before { color: var(--accent-gold); }
+
+        .warning-banner { background: rgba(220, 38, 38, 0.1); border-left: 4px solid #dc2626; padding: 20px 30px; border-radius: 8px; margin-top: 20px; }
+        .warning-banner p { color: #fca5a5; font-weight: 500; margin-bottom: 10px; }
+        .warning-banner p:last-child { margin-bottom: 0; }
+        .warning-banner span { color: #fff; font-weight: 700; }
+
+        /* GALÉRIA STÍLUSOK (Ugyanaz mint volt, csak a hover színek lettek kékek) */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 30px; }
+        .gallery-item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: var(--transition); background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.5); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
+        .gallery-item img, .gallery-item video, .gallery-item iframe { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); opacity: 0.8; }
+        .gallery-item:hover { border-color: var(--accent-main); box-shadow: 0 10px 25px rgba(29, 78, 216, 0.3); transform: translateY(-5px); }
+        .gallery-item:hover img, .gallery-item:hover video { opacity: 1; transform: scale(1.05); }
+        .gallery-caption { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 15px 15px; background: linear-gradient(transparent, rgba(0,0,0,0.95)); color: #fff; font-size: 0.9rem; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .gallery-date { font-size: 0.7rem; color: var(--accent-gold); display: block; margin-top: 3px; text-transform: uppercase; font-weight: 500; }
+        .enlarge-btn { position: absolute; bottom: 15px; right: 15px; background: rgba(29, 78, 216, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; z-index: 10; transition: var(--transition); text-transform: uppercase; font-weight: 700; pointer-events: auto; }
+        .enlarge-btn:hover { background: var(--accent-gold); transform: translateY(-2px); color: #000; }
+
+        .auth-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px; }
+        .auth-box { background: var(--bg-card); padding: 40px; border-radius: 12px; border-top: 4px solid var(--accent-gold); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .auth-box.box-main { border-top-color: var(--accent-main); }
+        .auth-box h2 { font-size: 1.8rem; margin-bottom: 30px; letter-spacing: 1px; text-transform: uppercase; }
+
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-size: 0.8rem; color: var(--text-gray); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); padding: 15px; color: #fff; border-radius: 6px; font-family: inherit; transition: var(--transition); resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent-main); background: rgba(0,0,0,0.8); box-shadow: 0 0 15px rgba(29, 78, 216, 0.2); }
+        .section-divider { margin: 40px 0 20px 0; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--accent-gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-gold) 0%, #b45309 100%); color: #fff; border: none; font-weight: 700; text-transform: uppercase; border-radius: 6px; transition: var(--transition); margin-bottom: 15px; letter-spacing: 2px; font-size: 0.9rem; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3); }
+        .btn-main { background: linear-gradient(135deg, var(--accent-main) 0%, #1e3a8a 100%); }
+        .btn-main:hover { box-shadow: 0 10px 20px rgba(29, 78, 216, 0.3); }
+
+        .status-banner { background: var(--bg-card); padding: 40px; border-left: 4px solid var(--accent-gold); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .badge { padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .badge.pending { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+        .badge.approved { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .badge.rejected { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+        .admin-grid { display: grid; grid-template-columns: 350px 1fr; gap: 40px; }
+        .admin-list { background: var(--bg-card); padding: 30px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); max-height: 800px; overflow-y: auto; }
+        .app-item { padding: 20px; background: rgba(0,0,0,0.4); margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); transition: var(--transition); position: relative; overflow: hidden; }
+        .app-item::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: transparent; transition: var(--transition); }
+        .app-item:hover, .app-item.selected { border-color: rgba(29, 78, 216, 0.3); background: rgba(29, 78, 216, 0.05); transform: translateX(5px); }
+        .app-item:hover::before, .app-item.selected::before { background: var(--accent-main); }
+        .admin-content { background: var(--bg-card); padding: 50px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .qa-box { margin-bottom: 25px; background: rgba(0,0,0,0.4); padding: 20px; border-left: 2px solid var(--accent-gold); border-radius: 0 8px 8px 0; }
+        .qa-box h5 { color: var(--accent-gold); margin-bottom: 10px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .qa-box p { color: #e2e8f0; line-height: 1.6; font-size: 0.95rem; }
+        
+        .toast { position: fixed; bottom: 40px; right: 40px; padding: 20px 30px; background: #0f172a; border-left: 4px solid var(--accent-main); z-index: 9999; transform: translateX(150%); transition: cubic-bezier(0.4, 0, 0.2, 1) 0.5s; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.8); border-radius: 4px; display: flex; align-items: center; gap: 15px; }
+        .toast.show { transform: translateX(0); }
+
+        .loader { display: none; margin: 30px auto; width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.05); border-top: 3px solid var(--accent-main); border-radius: 50%; animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media(max-width: 1000px) { .auth-container, .story-grid, .admin-grid, .info-grid { grid-template-columns: 1fr; } .title-large { font-size: 2.5rem; } }
+        
+        footer { padding: 40px 5%; border-top: 1px solid rgba(255, 255, 255, 0.05); background: rgba(2, 6, 23, 0.95); text-align: center; color: var(--text-gray); font-size: 0.85rem; letter-spacing: 1px; margin-top: 50px; }
+        .dev-highlight { color: var(--accent-gold); font-weight: 600; }
+        .security-badge { margin-top: 15px; display: inline-block; padding: 5px 15px; background: rgba(29, 78, 216, 0.1); border: 1px solid rgba(29, 78, 216, 0.2); border-radius: 20px; font-size: 0.75rem; color: #60a5fa; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    <div class="custom-cursor-dot" id="cursor-dot"></div>
+    <div class="custom-cursor-outline" id="cursor-outline"></div>
+
+    <nav>
+        <div class="logo">
+            <img src="IAA LOGO.png" alt="IAA Logo" style="border-radius: 50%;">
+            IAA <span>.</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-btn active" data-target="home-view">Főoldal</a></li>
+            <li><a href="#" class="nav-btn" data-target="gallery-view">Archívum</a></li>
+            <li><a href="#" class="nav-btn" id="nav-status" data-target="status-view" style="display:none;">TGF Állapota</a></li>
+            <li><a href="#" class="nav-btn" id="nav-admin" data-target="admin-view" style="display:none;">TGF LAPOK</a></li>
+            <li><a href="#" class="nav-btn" id="nav-auth" data-target="auth-view">Azonosítás</a></li>
+            <li><span id="logged-in-user" style="display:none; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin: 0 10px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;"></span></li>
+            <li><a href="#" class="nav-btn" id="nav-logout" style="display:none;" onclick="logout()">Kijelentkezés</a></li>
+            <li><a href="#" class="nav-btn btn-tgf" data-target="tgf-view">Jelentkezés</a></li>
+        </ul>
+    </nav>
+
+    <div class="toast" id="toast">Értesítés</div>
+
+    <!-- KÉP NAGYÍTÓ MODAL -->
+    <div id="image-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(2,6,23,0.95); z-index:9000; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(10px);">
+        <span style="position:absolute; top:30px; right:50px; color:var(--text-gray); font-size:50px; font-weight:300; transition: var(--transition);" onmouseover="this.style.color='var(--accent-main)'" onmouseout="this.style.color='var(--text-gray)'" onclick="closeModal()">&times;</span>
+        <img id="modal-img" style="max-width:90%; max-height:80%; border-radius:8px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);">
+        <div id="modal-caption" style="color:#fff; margin-top:20px; font-size:1.2rem; font-family:'Montserrat', sans-serif; letter-spacing: 1px; text-transform: uppercase;"></div>
+    </div>
+
+    <!-- 1. FŐOLDAL -->
+    <div class="view-section active-view" id="home-view">
+        <div class="story-grid">
+            <div class="story-content">
+                <h1 class="title-large">International<br><span>Affairs Agency</span></h1>
+                <p class="subtitle">Hűség. Integritás. Titoktartás.</p>
+                
+                <div class="story-text">
+                    <p>Az International Affairs Agency egy független szövetségi hírszerző ügynökség, amely közvetlenül a Hori önkormányzat alá tartozik. Elsődleges feladata a nemzetbiztonságot veszélyeztető tényezők felderítése, a terrorizmus elleni küzdelem, valamint a belföldi és külföldi hírszerzési műveletek koordinálása.</p>
+                    <p>A Los Santos-i kirendeltség 2026. március 22-én kezdte meg operatív működését a városban. Az ügynökség jelenléte válasz a növekvő nemzetközi bűnözői hálózatok terjedésére, a politikai instabilitásra és az állami szintű korrupcióra.</p>
+                    <p>Az IAA olyan speciális hatáskörökkel rendelkezik, amelyek lehetővé teszik a beavatkozást ott, ahol a hagyományos rendvédelmi szervek jogköre véget ér. Alapelvünk: A láthatatlanság a legnagyobb fegyverünk. Az árnyékban dolgozunk, hogy a lakosság fényben élhessen.</p>
+                </div>
+            </div>
+            
+            <div class="faction-image-container">
+                <img src="IAA LOGO.png" alt="IAA Logo">
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box box-req">
+                <h3 style="color: var(--accent-main);">Elvárásaink az ügynököktől</h3>
+                <ul>
+                    <li>Betöltött 15. életév (Vékony hang esetén nincs módunkban elhinni, ehhez szigorúan ragaszkodunk!)</li>
+                    <li>Teljes komolyság és fegyelmezettség</li>
+                    <li>Napi szintű aktivitás (minimum 2-3 óra szolgálat)</li>
+                    <li>Szerver szabályzat teljes mértékű ismerete</li>
+                    <li>Legalább 5 hónap RP tapasztalat</li>
+                    <li>Kiváló csapatmunka képesség</li>
+                    <li>Játékostársak feltétlen tisztelete</li>
+                </ul>
+            </div>
+            
+            <div class="info-box box-offer">
+                <h3 style="color: var(--accent-gold);">Amit az IAA kínál</h3>
+                <ul>
+                    <li>~15 darab egyedi, speciális gépjármű</li>
+                    <li>A rendvédelmek közül a legjobb fizetés! (150.000$+ / óra)</li>
+                    <li>Tapasztalt vezetőség és szigorúan megválogatott állomány</li>
+                    <li>Rengeteg minőségi RP lehetőség</li>
+                    <li>Különleges alosztályokba való csatlakozási lehetőség</li>
+                    <li><strong style="color: #fff;">BÓNUSZ:</strong> Sikeres felvétel és 3 hét aktív szolgálat után egyszeri 5.000.000$ bónusz!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="warning-banner">
+            <p><span>FIGYELEM!</span> A jelentkezési lapon való hazugságot nem tűrjük, azonnali és örökös Blacklist jár érte a frakcióból.</p>
+            <p>A Leadereket a lapod elfogadásáig <span>TILOS zaklatni</span> (akár IC, akár OOC)! Aki ezt megszegi, annak a jelentkezése automatikusan elutasításra kerül.</p>
+        </div>
+
+        <div style="margin-top: 80px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 60px;">
+            <h2 class="title-large" style="font-size: 2.5rem;">Aktuális <span>Műveletek</span></h2>
+            <p class="subtitle" style="margin-bottom: 30px;">Kiemelt pillanatok a terepről</p>
+            <div class="gallery-grid" id="mini-gallery-container" style="margin-bottom: 40px;">
+                <!-- Ide tölt be 3 képet a JS -->
+            </div>
+            <button class="btn-submit btn-main" style="width: auto; padding: 12px 35px;" onclick="switchView('gallery-view')">Tovább a teljes archívumba ➔</button>
+        </div>
+    </div>
+
+    <!-- 2. GALÉRIA NÉZET -->
+    <div class="view-section" id="gallery-view">
+        <h1 class="title-large">Hivatalos <span>Archívum</span></h1>
+        <p class="subtitle">Osztályozott felvételek és dokumentációk</p>
+
+        <div id="admin-gallery-upload" class="auth-box box-main" style="display:none; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: var(--accent-main); margin-bottom: 10px;">Új Akta Hozzáadása (Leader Jogosultság)</h3>
+            <p style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 20px;">Töltsd fel a képet/videót Discordra, másold a linkjét és illeszd be. YouTube videónál használd a teljes linket.</p>
+            
+            <div class="form-group">
+                <label>Fájl vagy URL hivatkozása:</label>
+                <input type="text" id="media-url" placeholder="https://cdn.discordapp.com/... vagy https://youtube.com/...">
+            </div>
+            <div class="form-group">
+                <label>Művelet megnevezése (opcionális):</label>
+                <input type="text" id="media-title" placeholder="Pl.: Elfogás a repülőtéren">
+            </div>
+            <button class="btn-submit" style="background: #16a34a; margin-bottom:0;" onclick="uploadMedia()">Rögzítés az Adatbázisban</button>
+        </div>
+
+        <div class="loader" id="gallery-loader"></div>
+        <div class="gallery-grid" id="full-gallery-container">
+            <!-- Képek betöltése -->
+        </div>
+    </div>
+
+    <!-- 3. BEJELENTKEZÉS / REGISZTRÁCIÓ -->
+    <div class="view-section" id="auth-view">
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h1 class="title-large">Azonosítási <span>Portál</span></h1>
+            <p class="subtitle">Biztonságos belépés a hálózatba</p>
+        </div>
+        <div class="loader" id="auth-loader"></div>
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2>Bejelentkezés</h2>
+                <div class="form-group">
+                    <label>Azonosító (IC név vagy Leader név)</label>
+                    <input type="text" id="login-name" placeholder="Pl.: John Doe vagy leader">
+                </div>
+                <div class="form-group">
+                    <label>Titkosítási kulcs (Jelszó)</label>
+                    <input type="password" id="login-pass" placeholder="••••••••">
+                </div>
+                <button class="btn-submit" onclick="handleAuth('login', 'player')">Játékos Belépés</button>
+                <button class="btn-submit btn-main" onclick="handleAuth('login', 'leader')">Vezetőségi Belépés</button>
+            </div>
+
+            <div class="auth-box box-main">
+                <h2>Regisztráció</h2>
+                <div class="form-group">
+                    <label>IC Neved (Pontosan!)</label>
+                    <input type="text" id="reg-name" placeholder="Pl.: John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Titkosítási kulcs megadása (Jelszó)</label>
+                    <input type="password" id="reg-pass" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Discord Neved</label>
+                    <input type="text" id="reg-dc" placeholder="Pl.: agent99">
+                </div>
+                <button class="btn-submit btn-main" onclick="handleAuth('register', 'player')">Azonosító Létrehozása</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. TAGFELVÉTEL -->
+    <div class="view-section" id="tgf-view">
+        <h1 class="title-large">Jelentkezési <span>Akta</span></h1>
+        <p class="subtitle">Töltsd ki a dokumentumokat a csatlakozáshoz</p>
+        
+        <div id="tgf-guest-msg" class="auth-box" style="text-align: center; max-width: 600px; margin: 50px auto;">
+            <h3 style="margin-bottom: 15px; color: #ef4444;">Hozzáférés megtagadva</h3>
+            <p style="color: var(--text-gray);">Kérlek jelentkezz be, vagy regisztrálj az akták kitöltéséhez!</p>
+        </div>
+
+        <div id="tgf-form-container" class="auth-box box-main" style="display:none; max-width: 900px; margin: 0 auto;">
+            
+            <div class="section-divider">OOC Kérdések</div>
+            
+            <div class="form-group">
+                <label>1. Mi a Discord neved? *</label>
+                <input type="text" id="tgf-q1" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>2. Mi a Discord ID-d? *</label>
+                <input type="text" id="tgf-q2" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>3. Hány éves vagy? (OOC) *</label>
+                <input type="text" id="tgf-q3" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>4. Mióta játszol RP szervereken? *</label>
+                <input type="text" id="tgf-q4" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>5. Mesélj magadról egy kicsit (OOC, 4-5 mondatban) *</label>
+                <textarea id="tgf-q5" rows="5" placeholder="Saját válasz"></textarea>
+            </div>
+            <div class="form-group">
+                <label>6. Miért pont téged válasszunk? *</label>
+                <textarea id="tgf-q6" rows="4" placeholder="Saját válasz"></textarea>
+            </div>
+
+            <div class="section-divider">IC Kérdések</div>
+
+            <div class="form-group">
+                <label>7. Hogy hívják? *</label>
+                <input type="text" id="tgf-q7" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>8. Volt e korábban más rendvédelmi szervnél? Ha igen, akkor hol? *</label>
+                <input type="text" id="tgf-q8" placeholder="Saját válasz">
+            </div>
+            <div class="form-group">
+                <label>9. Hogyan vezetne le egy igazoltatást? *</label>
+                <textarea id="tgf-q9" rows="5" placeholder="Saját válasz"></textarea>
+            </div>
+            <div class="form-group">
+                <label>10. Miért pont nálunk szeretne dolgozni? *</label>
+                <textarea id="tgf-q10" rows="4" placeholder="Saját válasz"></textarea>
+            </div>
+
+            <div class="loader" id="tgf-loader"></div>
+            <button class="btn-submit btn-main" style="margin-top: 20px;" onclick="submitTgf()">Akta Beküldése Vizsgálatra</button>
+        </div>
+    </div>
+
+    <!-- 5. ÁLLAPOT -->
+    <div class="view-section" id="status-view">
+        <h1 class="title-large">Aktám <span>Állapota</span></h1>
+        <p class="subtitle">Igazgatósági határozat</p>
+        <div class="loader" id="status-loader"></div>
+        <div id="status-content" style="max-width: 800px; margin: 0 auto;"></div>
+    </div>
+
+    <!-- 6. ADMIN PANEL -->
+    <div class="view-section" id="admin-view">
+        <h1 class="title-large">Igazgatósági <span>Központ</span></h1>
+        <p class="subtitle">Bizalmas akták és jelentkezések bírálata</p>
+        
+        <div class="admin-grid">
+            <div class="admin-list" id="admin-list">
+                <p style="color:var(--text-gray);">Akták betöltése folyamatban...</p>
+            </div>
+            <div class="admin-content" id="admin-content">
+                <div style="height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.5;">
+                    <h3 style="color:var(--text-gray); font-weight: 400; letter-spacing: 1px;">Válassz ki egy aktát a bal oldali listából.</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // FIGYELEM: IDE MAJD AZ ÚJ GOOGLE SHEET APPS SCRIPT LINKJÉT KELL BETENNI!!!
+        const API_URL = "https://script.google.com/macros/s/AKfycbw3dVkm0_BNkw53umRegf2Dt6w15K--jdTUZ8qPIBbXqWI0L2tEVXuficMFOqhcIHiC/exec";
+        
+        let currentUser = JSON.parse(localStorage.getItem('iaa_user')) || null;
+
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('cursor-dot').style.left = e.clientX + 'px';
+            document.getElementById('cursor-dot').style.top = e.clientY + 'px';
+            document.getElementById('cursor-outline').animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 150, fill: "forwards" });
+        });
+
+        document.querySelectorAll('a, button, span, input, textarea').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.getElementById('cursor-outline').style.transform = 'translate(-50%, -50%) scale(1.5)';
+                document.getElementById('cursor-outline').style.borderColor = 'var(--accent-main)';
+            });
+            el.addEventListener('mouseleave', () => {
+                document.getElementById('cursor-outline').style.transform = 'translate(-50%, -50%) scale(1)';
+                document.getElementById('cursor-outline').style.borderColor = 'rgba(251, 191, 36, 0.5)';
+            });
+        });
+
+        const views = document.querySelectorAll('.view-section');
+        const btns = document.querySelectorAll('.nav-btn');
+        function switchView(id) {
+            views.forEach(v => {
+                v.classList.remove('active-view');
+                v.style.animation = 'none'; 
+                v.offsetHeight; 
+            });
+            const active = document.getElementById(id);
+            active.classList.add('active-view');
+            active.style.animation = 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+            
+            btns.forEach(b => b.classList.toggle('active', b.getAttribute('data-target') === id));
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            if(id === 'status-view') loadStatus();
+            if(id === 'admin-view') loadAdmin();
+            if(id === 'gallery-view') loadGallery();
+        }
+        
+        btns.forEach(b => b.addEventListener('click', e => {
+            if(b.getAttribute('data-target')) { e.preventDefault(); switchView(b.getAttribute('data-target')); }
+        }));
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerHTML = `<span style="font-size: 1.2rem;">🛡️</span> ${msg}`;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        function updateUI() {
+            const userDisplay = document.getElementById('logged-in-user');
+            if(currentUser) {
+                document.getElementById('nav-auth').style.display = 'none';
+                document.getElementById('nav-logout').style.display = 'block';
+                document.getElementById('nav-status').style.display = 'block';
+                document.getElementById('tgf-guest-msg').style.display = 'none';
+                document.getElementById('tgf-form-container').style.display = 'block';
+                
+                const isAdmin = currentUser.role === 'admin';
+                document.getElementById('nav-admin').style.display = isAdmin ? 'block' : 'none';
+                document.getElementById('admin-gallery-upload').style.display = isAdmin ? 'block' : 'none';
+                
+                if(userDisplay) {
+                    userDisplay.innerText = `Azonosítva: ${currentUser.username}`;
+                    userDisplay.style.display = 'inline-block';
+                }
+            } else {
+                document.getElementById('nav-auth').style.display = 'block';
+                document.getElementById('nav-logout').style.display = 'none';
+                document.getElementById('nav-status').style.display = 'none';
+                document.getElementById('nav-admin').style.display = 'none';
+                document.getElementById('admin-gallery-upload').style.display = 'none';
+                document.getElementById('tgf-guest-msg').style.display = 'block';
+                document.getElementById('tgf-form-container').style.display = 'none';
+                if(userDisplay) userDisplay.style.display = 'none';
+            }
+            loadGallery(); 
+        }
+
+        async function fetchAPI(data) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch(e) {
+                return { success: false, message: "Hálózati hiba. A szerver nem elérhető." };
+            }
+        }
+
+        async function handleAuth(action, type) {
+            document.getElementById('auth-loader').style.display = 'block';
+            let data = { action: action, type: type };
+            
+            if(action === 'login') {
+                data.username = document.getElementById('login-name').value.trim();
+                data.password = document.getElementById('login-pass').value;
+            } else {
+                data.username = document.getElementById('reg-name').value.trim();
+                data.password = document.getElementById('reg-pass').value;
+                data.discord_name = document.getElementById('reg-dc').value.trim();
+            }
+
+            if(!data.username || !data.password) {
+                showToast("Minden mezőt kötelező kitölteni!");
+                document.getElementById('auth-loader').style.display = 'none';
+                return;
+            }
+
+            const res = await fetchAPI(data);
+            document.getElementById('auth-loader').style.display = 'none';
+            showToast(res.message);
+
+            if(res.success && action === 'login') {
+                currentUser = res.user;
+                localStorage.setItem('iaa_user', JSON.stringify(currentUser));
+                updateUI();
+                switchView('home-view');
+            }
+        }
+
+        function logout() {
+            currentUser = null; localStorage.removeItem('iaa_user');
+            updateUI(); showToast("Sikeresen kijelentkeztél a hálózatból."); switchView('home-view');
+        }
+
+        async function submitTgf() {
+            const data = {
+                action: "submitTgf",
+                username: currentUser.username,
+                q1: document.getElementById('tgf-q1').value.trim(),
+                q2: document.getElementById('tgf-q2').value.trim(),
+                q3: document.getElementById('tgf-q3').value.trim(),
+                q4: document.getElementById('tgf-q4').value.trim(),
+                q5: document.getElementById('tgf-q5').value.trim(),
+                q6: document.getElementById('tgf-q6').value.trim(),
+                q7: document.getElementById('tgf-q7').value.trim(),
+                q8: document.getElementById('tgf-q8').value.trim(),
+                q9: document.getElementById('tgf-q9').value.trim(),
+                q10: document.getElementById('tgf-q10').value.trim()
+            };
+
+            // Ellenőrzés, hogy minden ki van-e töltve
+            for (let key in data) {
+                if (data[key] === "") {
+                    return showToast("Minden kérdés megválaszolása kötelező!");
+                }
+            }
+
+            document.getElementById('tgf-loader').style.display = 'block';
+            const res = await fetchAPI(data);
+            document.getElementById('tgf-loader').style.display = 'none';
+            
+            showToast(res.message);
+            if(res.success) {
+                for(let i=1; i<=10; i++) document.getElementById('tgf-q' + i).value = '';
+                switchView('status-view');
+            }
+        }
+
+        async function loadStatus() {
+            const box = document.getElementById('status-content');
+            document.getElementById('status-loader').style.display = 'block';
+            box.innerHTML = '';
+            
+            const res = await fetchAPI({ action: "getStatus", username: currentUser.username });
+            document.getElementById('status-loader').style.display = 'none';
+
+            if(res.hasApp) {
+                let cl = res.status === 'Elfogadva' ? 'approved' : (res.status === 'Elutasítva' ? 'rejected' : 'pending');
+                box.innerHTML = `
+                    <div class="status-banner">
+                        <div>
+                            <h3 style="font-size:1.5rem; margin-bottom: 8px;">Azonosító: <span style="color:#fff;">${currentUser.username}</span></h3>
+                            <p style="color:var(--text-gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Aktuális státusz</p>
+                        </div>
+                        <div class="badge ${cl}">${res.status}</div>
+                    </div>
+                    ${res.reason ? `<div class="auth-box box-main" style="margin-top:30px;"><h3 style="color:var(--accent-main); margin-bottom: 10px;">Igazgatósági Indoklás:</h3><p style="line-height: 1.8; color: #fff;">${res.reason}</p></div>` : ''}
+                `;
+            } else {
+                box.innerHTML = `<div class="auth-box" style="text-align: center;"><h3>Még nem adtál le jelentkezési aktát!</h3><p style="color: var(--text-gray); margin-top: 10px;">Látogass el a Jelentkezés menüpontba.</p></div>`;
+            }
+        }
+
+        async function loadAdmin() {
+            const list = document.getElementById('admin-list');
+            list.innerHTML = 'Akták lekérése a szerverről...';
+            const res = await fetchAPI({ action: "getAdminApps" });
+            
+            if(res.success && res.apps.length > 0) {
+                list.innerHTML = '<h3 style="margin-bottom: 20px; color: #fff; text-transform: uppercase; letter-spacing: 1px; font-size: 1.2rem;">Függőben lévő akták</h3>';
+                res.apps.forEach(app => {
+                    const d = document.createElement('div');
+                    d.className = 'app-item';
+                    d.innerHTML = `<h4 style="margin-bottom: 5px; color: #fff; letter-spacing: 1px;">${app.username}</h4><span style="color:var(--accent-gold); font-size:0.75rem; text-transform: uppercase; font-weight: 700;">${app.status}</span>`;
+                    d.onclick = () => showAppDetail(app, d);
+                    list.appendChild(d);
+                });
+            } else {
+                list.innerHTML = '<p style="color:var(--text-gray);">Nincs új jelentkező.</p>';
+                document.getElementById('admin-content').innerHTML = '<div style="height: 100%; display: flex; align-items: center; justify-content: center;"><h3 style="color:var(--text-gray); font-weight: 400;">Minden akta feldolgozva.</h3></div>';
+            }
+        }
+
+        function showAppDetail(app, elem) {
+            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('selected'));
+            elem.classList.add('selected');
+            
+            document.getElementById('admin-content').innerHTML = `
+                <h2 style="font-size: 2rem; margin-bottom:30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; text-transform: uppercase;">Jelentkező: <span style="color: var(--accent-main);">${app.username}</span></h2>
+                
+                <h4 style="color: var(--accent-gold); margin: 30px 0 15px 0; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 5px;">OOC SZEKCIÓ</h4>
+                <div class="qa-box"><h5>1. Discord név</h5><p>${app.q1}</p></div>
+                <div class="qa-box"><h5>2. Discord ID</h5><p>${app.q2}</p></div>
+                <div class="qa-box"><h5>3. OOC Kor</h5><p>${app.q3}</p></div>
+                <div class="qa-box"><h5>4. Mióta játszik RP szervereken?</h5><p>${app.q4}</p></div>
+                <div class="qa-box"><h5>5. Bemutatkozás (OOC)</h5><p>${app.q5}</p></div>
+                <div class="qa-box"><h5>6. Miért pont őt válasszuk?</h5><p>${app.q6}</p></div>
+                
+                <h4 style="color: var(--accent-gold); margin: 40px 0 15px 0; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 5px;">IC SZEKCIÓ</h4>
+                <div class="qa-box"><h5>7. IC Név</h5><p>${app.q7}</p></div>
+                <div class="qa-box"><h5>8. Volt e korábban rendvédelmi szervnél? Hol?</h5><p>${app.q8}</p></div>
+                <div class="qa-box"><h5>9. Hogyan vezetne le egy igazoltatást?</h5><p>${app.q9}</p></div>
+                <div class="qa-box"><h5>10. Miért pont nálunk szeretne dolgozni?</h5><p>${app.q10}</p></div>
+                
+                <div style="margin-top:40px; background: rgba(0,0,0,0.5); padding: 30px; border-radius: 8px; border: 1px solid rgba(29, 78, 216, 0.3);">
+                    <h4 style="margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Igazgatósági Határozat</h4>
+                    <input type="text" id="admin-reason" placeholder="Indoklás csatolása (Elutasításnál kötelező)" style="width:100%; padding:15px; background:rgba(0,0,0,0.8); color:#fff; border:1px solid rgba(255,255,255,0.1); margin-bottom:20px; border-radius:6px; font-family: inherit;">
+                    <div style="display:flex; gap:20px;">
+                        <button class="btn-submit" style="background: linear-gradient(135deg, #16a34a 0%, #14532d 100%); margin-bottom: 0;" onclick="review('${app.id}', 'Elfogadva')">✓ Elfogadás</button>
+                        <button class="btn-submit" style="background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%); margin-bottom: 0;" onclick="review('${app.id}', 'Elutasítva')">✕ Elutasítás</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function review(appId, status) {
+            const reason = document.getElementById('admin-reason').value.trim();
+            if(status === 'Elutasítva' && !reason) return showToast("Elutasítás esetén az indoklás megadása kötelező!");
+            
+            showToast("Határozat rögzítése a szerveren...");
+            const res = await fetchAPI({ action: "reviewApp", appId, status, reason });
+            showToast(res.message);
+            if(res.success) {
+                document.getElementById('admin-content').innerHTML = '<div style="height: 100%; display: flex; align-items: center; justify-content: center;"><h3 style="color:var(--text-gray); font-weight: 400;">Akta lezárva. Válassz egy újat.</h3></div>';
+                loadAdmin();
+            }
+        }
+
+        function openModal(url, title) {
+            document.getElementById('modal-img').src = url;
+            document.getElementById('modal-caption').innerText = title || 'Osztályozott felvétel';
+            document.getElementById('image-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').style.display = 'none';
+            document.getElementById('modal-img').src = ''; 
+        }
+
+        async function uploadMedia() {
+            const url = document.getElementById('media-url').value.trim();
+            const title = document.getElementById('media-title').value.trim();
+            if(!url) return showToast("Az URL megadása kötelező!");
+            
+            showToast("Fájl rögzítése az archívumban...");
+            const res = await fetchAPI({ action: "addMedia", url: url, title: title, uploader: currentUser.username });
+            showToast(res.message);
+            if(res.success) {
+                document.getElementById('media-url').value = '';
+                document.getElementById('media-title').value = '';
+                loadGallery(); 
+            }
+        }
+
+        function getMediaTag(url, title, isMini = false) {
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                let videoId = '';
+                try {
+                    if (url.includes('youtube.com/watch?v=')) videoId = url.split('v=')[1].split('&')[0];
+                    else if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
+                    else videoId = url;
+                } catch(e) { videoId = url; }
+                
+                if (isMini) return `<img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" alt="${title}" style="width:100%; height:100%; object-fit:cover;">`;
+                return `<iframe src="https://www.youtube.com/embed/${videoId}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%; height:100%; border-radius: 8px;"></iframe>`;
+            } 
+            else if (url.includes('.mp4') || url.includes('.webm') || url.includes('.mov')) {
+                if (isMini) return `<video src="${url}" muted autoplay loop style="width:100%; height:100%; object-fit:cover;"></video>`;
+                return `<video src="${url}" controls muted style="width:100%; height:100%; object-fit:cover;"></video>`;
+            } 
+            else {
+                return `<img src="${url}" alt="${title}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+        }
+
+        async function loadGallery() {
+            const loader = document.getElementById('gallery-loader');
+            if (loader) loader.style.display = 'block';
+            
+            const res = await fetchAPI({ action: "getGallery" });
+            if (loader) loader.style.display = 'none';
+
+            if(res.success && res.media && res.media.length > 0) {
+                let htmlContent = '';
+                res.media.forEach(item => {
+                    let mediaTag = getMediaTag(item.url, item.title, false);
+                    let isImage = !item.url.includes('youtube.com') && !item.url.includes('youtu.be') && !item.url.includes('.mp4') && !item.url.includes('.webm') && !item.url.includes('.mov');
+                    let enlargeBtn = isImage ? `<button class="enlarge-btn" onclick="openModal('${item.url}', '${item.title}')">🔍 Nagyítás</button>` : '';
+
+                    htmlContent += `
+                        <div class="gallery-item">
+                            ${mediaTag}
+                            <div class="gallery-caption">
+                                ${item.title || 'Osztályozott felvétel'}
+                                <span class="gallery-date">Feltöltötte: ${item.uploader} | ${item.date}</span>
+                            </div>
+                            ${enlargeBtn}
+                        </div>
+                    `;
+                });
+
+                const fullContainer = document.getElementById('full-gallery-container');
+                if (fullContainer) fullContainer.innerHTML = htmlContent;
+                
+                const miniContainer = document.getElementById('mini-gallery-container');
+                if (miniContainer) {
+                    const miniGalleryItems = res.media.slice(0, 3).map(item => {
+                        let mediaTag = getMediaTag(item.url, item.title, true);
+                        let isImage = !item.url.includes('youtube.com') && !item.url.includes('youtu.be') && !item.url.includes('.mp4') && !item.url.includes('.webm') && !item.url.includes('.mov');
+                        let enlargeBtn = isImage ? `<button class="enlarge-btn" onclick="openModal('${item.url}', '${item.title}')">🔍 Nagyítás</button>` : '';
+
+                        return `<div class="gallery-item">${mediaTag}${enlargeBtn}</div>`;
+                    }).join('');
+                    miniContainer.innerHTML = miniGalleryItems;
+                }
+            } else {
+                const fullContainer = document.getElementById('full-gallery-container');
+                if (fullContainer) fullContainer.innerHTML = '<p style="color:var(--text-gray); text-align:center; grid-column: 1 / -1;">Még nincsenek feltöltött dokumentumok.</p>';
+                
+                const miniContainer = document.getElementById('mini-gallery-container');
+                if (miniContainer) miniContainer.innerHTML = '<p style="color:var(--text-gray); text-align:center; grid-column: 1 / -1;">Még nincsenek kiemelt pillanatok.</p>';
+            }
+        }
+
+        updateUI();
+    </script>
+    
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 International Affairs Agency. Minden jog fenntartva.</p>
+            <p>Rendszer adminisztrátor: <span class="dev-highlight">xmatee.</span></p>
+            <div class="security-badge">🔒 Titkosított Kormányzati Hálózat</div>
+        </div>
+    </footer>
+</body>
+</html>
